@@ -1,5 +1,5 @@
 ![](pictures/basidia-logo.png)
-# Basidia
+
 Async reimplementation of [nameko](https://github.com/nameko/nameko).  First implementation will be built on AMQP with rabbitmq, however eventually the goal would be to support other broker types such as [nats.io](https://nats.io) or [kafka](https://kafka.apache.org/). HTTP endpoints will not be implemented in Basidia initially and the recommendation will be to create an API Gateway using a framework such as [fastapi](https://github.com/tiangolo/fastapi).  This could change in the future however.
 
 ## Goals
