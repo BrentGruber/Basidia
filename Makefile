@@ -1,0 +1,2 @@
+venv:
+	poetry shell
