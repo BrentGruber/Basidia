@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 aio-pika = "^8.2.4"
+msgpack = "^1.0.4"
 
 
 [build-system]

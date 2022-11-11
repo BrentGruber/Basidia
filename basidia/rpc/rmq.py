@@ -1,49 +1,71 @@
 import aio_pika
 import asyncio
+import logging
 
+class RpcConsumer:
 
-class RMQ:
+    queue_name = "test_queue"
 
-    def __init__(self):
-        self.CONNECTION_STRING="amqp://user:bitnami@127.0.0.1:5672/"
+    async def process_message(self, message: aio_pika.abc.AbstractIncomingMessage) -> None:
+        async with message.process():
+            print(message.body)
+            await asyncio.sleep(1)
 
-    async def connect(self, loop):
-        # Connect with the givien parameters is also valiable.
-        # aio_pika.connect_robust(host="host", login="login", password="password")
-        # You can only choose one option to create a connection, url or kw-based params.
-        self.connection = await aio_pika.connect_robust(
-            self.CONNECTION_STRING, loop=loop
+    
+    async def handle_message(self):
+
+        connection = await aio_pika.connect_robust(
+            "amqp://user:bitnami@127.0.0.1/"
         )
 
-    async def consume(self, queue):
-        async with queue.iterator() as queue_iter:
-            # Cancel consuming after __aexit__
-            async for message in queue_iter:
-                async with message.process():
-                    print(message.body)
-                    if queue.name in message.body.decode():
-                        break
+        async with connection:
+            # Create channel
+            channel = await connection.channel()
+
+            # Take no more than 10 messages in advance
+            await channel.set_qos(prefetch_count=10)
+
+            # Declaring queue
+            queue = await channel.declare_queue(self.queue_name, auto_delete=True)
+
+            await queue.consume(self.process_message)
+
+            try:
+                # Wait until terminate
+                await asyncio.Future()
+            finally:
+                await connection.close()
 
 
-async def main(loop):
-    rmq = RMQ()
-    await rmq.connect(loop)
+class RpcProducer:
+
     queue_name = "test_queue"
-    # Declaring queue
-    queue: aio_pika.abc.AbstractQueue = await rmq.connection.channel().declare_queue(
-        queue_name,
-        auto_delete=True
-    )
 
-    rmq.consume(queue)
+    async def publish_message(self):
+        connection = await aio_pika.connect_robust(
+            "amqp://user:bitnami@127.0.0.1/"
+        )
+
+        async with connection:
+            channel = await connection.channel()
+
+            await channel.default_exchange.publish(
+                aio_pika.Message(body=f"Hello World".encode()),
+                routing_key=self.queue_name,
+            )
+
+async def main():
+    logging.basicConfig(level=logging.INFO)
+    
+    consumer = RpcConsumer()
+    producer = RpcProducer()
+
+    #await producer.publish_message()
+    await asyncio.sleep(5)
+    await consumer.handle_message()
+    
+    
+    
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(loop))
-    loop.close()
-
-
-    
-
-
-    
+    loop = asyncio.run(main())
