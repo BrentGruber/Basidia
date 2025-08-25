@@ -1,16 +1,21 @@
-[tool.poetry]
+[project]
 name = "basidia"
 version = "0.1.0"
-description = ""
-authors = ["Brent Gruber <brent.gruber77@gmail.com>"]
+description = "Add your description here"
 readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aio-pika>=9.5.7",
+    "asyncio>=4.0.0",
+    "msgpack>=1.1.1",
+    "pydantic>=2.11.7",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-aio-pika = "^8.2.4"
-msgpack = "^1.0.4"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "isort>=6.0.1",
+    "mypy>=1.17.1",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "ruff>=0.12.10",
+]
