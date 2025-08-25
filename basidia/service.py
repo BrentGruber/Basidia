@@ -58,8 +58,6 @@ class Service:
     async def _handle_rpc_request(self, message: bytes):
         """Handle incoming RPC requests"""
         try:
-            print(f"{self.name} handling an incoming request")
-            print(self._rpc_methods)
             request = json.loads(message.decode())
             method_name = request["method"]
             args = request.get("args", [])
