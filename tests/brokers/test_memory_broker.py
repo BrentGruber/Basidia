@@ -32,7 +32,7 @@ class TestMemoryBroker:
         async with MemoryBroker() as broker:
             await broker.declare_queue("test_queue")
 
-            # INitially empty
+            # Initially empty
             assert broker.get_queue_size("test_queue") == 0
 
             # Publish message
@@ -148,7 +148,7 @@ class TestMemoryBroker:
     @pytest.mark.asyncio
     async def test_clear_queue_utility(self):
         async with MemoryBroker() as broker:
-            await broker.publish("test_queue", b"messsage1")
+            await broker.publish("test_queue", b"message1")
             await broker.publish("test_queue", b"message2")
 
             assert broker.get_queue_size("test_queue") == 2
